@@ -57,10 +57,9 @@ const RouterConfig = (props) => {
                         )
                     })}
                     {privateRoutes.map((route, index) => {
-                        if(auth.token === null || auth.token === undefined || auth.token === '') {
-                            return <Redirect key={index} to='/signin' />
-                        }
-                        else return (
+                        return (
+                            auth.token === null || auth.token === undefined || auth.token === '' ? 
+                            <Redirect key={index} to='/signin' /> : 
                             <Route key={index} path={route.path} exact={route.exact}>
                                 <route.component />
                             </Route>
