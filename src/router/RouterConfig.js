@@ -2,17 +2,37 @@ import React, { lazy, Suspense } from 'react';
 import {
     Switch,
     Route,
-    Redirect,
-    useLocation
+    Redirect
 } from "react-router-dom";
 import Loader from './../components/loader/Loader';
 import ErrorBoundary from './ErrorBoundary';
+import { connect } from 'react-redux';
+
+const mapStateToProps = state => {
+    return {
+        auth: state.auth
+    }
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+
+    }
+}
 
 const publicRoutes = [
     {
+        path: '/signin',
+        exact: true,
+        component: lazy(() => import('./../pages/signin/SignIn')),
+    },
+]
+
+const privateRoutes = [
+    {
         path: '/',
         exact: true,
-        component: lazy(() => import('./../pages/home/Home')),
+        component: lazy(() => import('../pages/home/Home')),
     },
     {
         path: '/profile',
@@ -21,21 +41,10 @@ const publicRoutes = [
     },
 ]
 
-// function PrivateRoute({ children, ...rest }) {
-//     let location = useLocation();
-//     const isLoggedIn = useSelector(state => state.auth.idToken);
-//     if (isLoggedIn) return <Route {...rest}>{children}</Route>;
-//     return (
-//         <Redirect
-//             to={{
-//                 pathname: '/signin',
-//                 state: { from: location },
-//             }}
-//         />
-//     );
-// }
-
-const RouterConfig = () => {
+const RouterConfig = (props) => {
+    const {
+        auth
+    } = props;
     return (
         <ErrorBoundary>
             <Suspense fallback={<Loader color='#2c2c54' size='10px' isAbsolute='true' />}>
@@ -47,13 +56,23 @@ const RouterConfig = () => {
                             </Route>
                         )
                     })}
-                    {/* <PrivateRoute path="/private-route">
-                        // load component private here
-                    </PrivateRoute> */}
+                    {privateRoutes.map((route, index) => {
+                        if(auth.token === null || auth.token === undefined || auth.token === '') {
+                            return <Redirect key={index} to='/signin' />
+                        }
+                        else return (
+                            <Route key={index} path={route.path} exact={route.exact}>
+                                <route.component />
+                            </Route>
+                        )
+                    })}
                 </Switch>
             </Suspense>
         </ErrorBoundary>
     )
 }
 
-export default RouterConfig;
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(RouterConfig);
