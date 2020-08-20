@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 const Profile = () => {
     return(
         <div className='WRAP_PROFILE'>
-            <div className="container">
+            <div>
                 <p>Hello World!</p>
                 <NavLink to='/'>Back to Home</NavLink>
             </div>

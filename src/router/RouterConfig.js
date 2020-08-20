@@ -2,11 +2,12 @@ import React, { lazy, Suspense } from 'react';
 import {
     Switch,
     Route,
-    Redirect
+    Redirect,
+    useLocation
 } from "react-router-dom";
 import Loader from './../components/loader/Loader';
 import ErrorBoundary from './ErrorBoundary';
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 
 const mapStateToProps = state => {
     return {
@@ -28,18 +29,21 @@ const publicRoutes = [
     },
 ]
 
-const privateRoutes = [
-    {
-        path: '/',
-        exact: true,
-        component: lazy(() => import('../pages/home/Home')),
-    },
-    {
-        path: '/profile',
-        exact: true,
-        component: lazy(() => import('../pages/profile/Profile')),
-    },
-]
+function PrivateRoute({ children, ...rest }) {
+    let location = useLocation();
+    const isLoggedIn = useSelector(state => state.auth.token);
+    if (isLoggedIn) return <Route {...rest}>{children}</Route>;
+    return (
+        <Redirect
+            to={{
+                pathname: '/signin',
+                state: { from: location },
+            }}
+        />
+    );
+}
+
+const Container = lazy(() => import('../components/layout/Container'));
 
 const RouterConfig = (props) => {
     const {
@@ -56,15 +60,9 @@ const RouterConfig = (props) => {
                             </Route>
                         )
                     })}
-                    {privateRoutes.map((route, index) => {
-                        return (
-                            auth.token === null || auth.token === undefined || auth.token === '' ? 
-                            <Redirect key={index} to='/signin' /> : 
-                            <Route key={index} path={route.path} exact={route.exact}>
-                                <route.component />
-                            </Route>
-                        )
-                    })}
+                    <PrivateRoute path='/'>
+                        <Container />
+                    </PrivateRoute>
                 </Switch>
             </Suspense>
         </ErrorBoundary>
