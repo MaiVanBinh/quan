@@ -10,7 +10,10 @@ const color = {
     light_o: '#bbbbbb'
 }
 
+const API_ROOT = "http://localhost:8080";
+
 export {
     typeReducer,
-    color
+    color,
+    API_ROOT
 }

@@ -2,7 +2,6 @@ const API_ROOT = 'http://my-website.com/'
 
 const apiName = {
     login: 'login',
-    user: 'users',
 }
 
 const getApiAuth = (method, apiNameOption, param) => {
